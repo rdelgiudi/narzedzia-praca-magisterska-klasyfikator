@@ -1,2 +1,2 @@
-# narzedzia-praca-magisterska-klasyfikator
+# Narzędzia klasyfikator zachowań
 Zestaw narzędzi użyty w mojej pracy magisterskiej
