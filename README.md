@@ -9,7 +9,7 @@ Aby uruchomić, wystarczy wpisać w wiersz poleceń następującą komendę:
 ```
 python recorder.py
 ```
-UWAGA! Przed pierwszym uruchomieniem należy stworzyć folder o nazwie "videos" znajdującym się w tym samym folderze co skrypty. Do poprawienia w następnej iteracji programu.
+UWAGA! Przed pierwszym uruchomieniem należy stworzyć folder o nazwie "videos" znajdujący się w tym samym folderze co skrypty. Do poprawienia w następnej iteracji programu.
 
 ### Instalacja
 Aby poprawnie działać, program wymaga bibliotek: NumPy, PyQt5, OpenCV, pyrealsense2 (wrapper oraz samo SDK).
