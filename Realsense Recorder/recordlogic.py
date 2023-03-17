@@ -3,8 +3,7 @@ import numpy as np
 import datetime
 from PyQt5 import QtGui
 import cv2
-from threading import Thread
-import queue
+import os
 from multiprocessing import Process, Queue
 
 def updateUi(window, depth_image_8U, color_image, fps, totalseconds):
@@ -73,6 +72,14 @@ def recording(worker):
     # config.enable_stream(rs.stream.depth, 640, 480, rs.format.z16, 30)
     config.enable_stream(rs.stream.depth, dims[0], dims[1], rs.format.z16, 30)
     config.enable_stream(rs.stream.color, dims[0], dims[1], rs.format.bgr8, 30)
+
+    #create output folder if it doesn't exist
+    folder_name = "videos"
+    if not os.path.exists(folder_name):
+        os.mkdir(folder_name)
+        print(f"Folder {folder_name} created successfully!")
+    else:
+        print(f"Folder {folder_name} already exists.")
 
     # Start streaming
     profile = pipeline.start(config)
