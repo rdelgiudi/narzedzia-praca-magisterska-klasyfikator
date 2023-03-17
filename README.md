@@ -9,7 +9,7 @@ Aby uruchomić, wystarczy wpisać w wiersz poleceń następującą komendę:
 ```
 python recorder.py
 ```
-UWAGA! Przed pierwszym uruchomieniem należy stworzyć folder o nazwie "videos" znajdujący się w tym samym folderze co skrypty. Do poprawienia w następnej iteracji programu.
+~~UWAGA! Przed pierwszym uruchomieniem należy stworzyć folder o nazwie "videos" znajdujący się w tym samym folderze co skrypty. Do poprawienia w następnej iteracji programu.~~ Nieaktualne.
 
 ### Instalacja
 Aby poprawnie działać, program wymaga bibliotek: NumPy, PyQt5, OpenCV, pyrealsense2 (wrapper oraz samo SDK).
@@ -36,3 +36,6 @@ sudo apt install libopencv-dev
 #### Inne problemy:
 
 TODO
+
+## Data Extractor
+Program do wydobywania klatek, aby zebrać dataset. Program wycina 11 klatek obrazu wokół wskazanej klatki oraz zapisuje w formie zdjęć oraz w formie pliku .npy. Program na ten moment uruchamia się, ale jest niekompletny.
