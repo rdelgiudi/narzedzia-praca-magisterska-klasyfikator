@@ -6,20 +6,20 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>969</width>
-    <height>798</height>
+    <width>1224</width>
+    <height>844</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Data extractor</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QLabel" name="videoLabel">
     <property name="geometry">
      <rect>
-      <x>120</x>
+      <x>40</x>
       <y>50</y>
-      <width>711</width>
+      <width>1131</width>
       <height>551</height>
      </rect>
     </property>
@@ -28,10 +28,13 @@
     </property>
    </widget>
    <widget class="QPushButton" name="cutButton">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
-      <x>770</x>
-      <y>680</y>
+      <x>1050</x>
+      <y>720</y>
       <width>75</width>
       <height>23</height>
      </rect>
@@ -43,8 +46,8 @@
    <widget class="QPushButton" name="quitButton">
     <property name="geometry">
      <rect>
-      <x>870</x>
-      <y>680</y>
+      <x>1140</x>
+      <y>720</y>
       <width>75</width>
       <height>23</height>
      </rect>
@@ -56,9 +59,9 @@
    <widget class="QLabel" name="frameLabel">
     <property name="geometry">
      <rect>
-      <x>620</x>
-      <y>680</y>
-      <width>141</width>
+      <x>860</x>
+      <y>720</y>
+      <width>181</width>
       <height>21</height>
      </rect>
     </property>
@@ -67,11 +70,14 @@
     </property>
    </widget>
    <widget class="QSlider" name="videoSlider">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>670</y>
-      <width>561</width>
+      <y>710</y>
+      <width>811</width>
       <height>41</height>
      </rect>
     </property>
@@ -80,29 +86,176 @@
     </property>
    </widget>
    <widget class="QPushButton" name="openButton">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="geometry">
      <rect>
-      <x>770</x>
-      <y>720</y>
+      <x>1050</x>
+      <y>760</y>
       <width>75</width>
       <height>23</height>
      </rect>
     </property>
     <property name="text">
-     <string>Open</string>
+     <string>Open Color</string>
     </property>
    </widget>
    <widget class="QPushButton" name="startButton">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
-      <x>870</x>
-      <y>720</y>
+      <x>260</x>
+      <y>760</y>
       <width>75</width>
       <height>23</height>
      </rect>
     </property>
     <property name="text">
-     <string>Start</string>
+     <string>Play</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="videoSpeedLabel">
+    <property name="geometry">
+     <rect>
+      <x>540</x>
+      <y>760</y>
+      <width>71</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Video Speed:</string>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="speedSpinBox">
+    <property name="geometry">
+     <rect>
+      <x>610</x>
+      <y>760</y>
+      <width>62</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="minimum">
+     <double>0.250000000000000</double>
+    </property>
+    <property name="maximum">
+     <double>4.000000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>0.250000000000000</double>
+    </property>
+    <property name="value">
+     <double>1.000000000000000</double>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="nextButton">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>350</x>
+      <y>760</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Next</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="previousButton">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>760</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Previous</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="tenBackButton">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>760</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&lt; 10</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="tenForwardButton">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>440</x>
+      <y>760</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>10 &gt;</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="openDepthButton">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>1140</x>
+      <y>760</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Open Depth</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="colorLabel">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>630</y>
+      <width>861</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Color video loaded:</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="depthLabel">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>670</y>
+      <width>861</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Depth video loaded:</string>
     </property>
    </widget>
   </widget>
@@ -111,7 +264,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>969</width>
+     <width>1224</width>
      <height>21</height>
     </rect>
    </property>
