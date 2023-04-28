@@ -18,7 +18,6 @@ if __name__ == "__main__":
     #    os.environ.pop("QT_QPA_PLATFORM_PLUGIN_PATH")
     #if sys.platform.startswith("linux") and ci_and_not_headless:
     #    os.environ.pop("QT_QPA_FONTDIR")
-
     app = QApplication(sys.argv)
     form = windowcontrol.MainDialog(app)
     form.show()

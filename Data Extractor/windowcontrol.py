@@ -56,6 +56,7 @@ class MainDialog(QMainWindow, windowview.Ui_MainWindow):
         self.total_frames = None
         self.depth_video = None
         self.total_frames_depth = None
+        self.cut_video_fragment = False
         
     # Funkcja łącząca kliknięcia guzików do odpowiednich funkcji
     def bindButtons(self):
@@ -71,7 +72,7 @@ class MainDialog(QMainWindow, windowview.Ui_MainWindow):
         self.tenBackButton.clicked.connect(self.previousTenFrame)
         self.tenForwardButton.clicked.connect(self.nextTenFrame)
         self.openDepthButton.clicked.connect(self.openDepthFile)
-    
+
     # Funkcja dezaktywująca przyciski interfejsu
     def toggleButtonsOff(self):
         self.cutButton.setEnabled(False)
@@ -202,32 +203,58 @@ class MainDialog(QMainWindow, windowview.Ui_MainWindow):
 
                 # Stworzenie folderu do którego wysyłane będą dane
                 dateandtime = time.strftime("%Y%m%d-%H%M%S")
-                output_dir = os.path.join(os.getcwd(), dateandtime + f" frame_{frame_number}")
+                output_dir = os.path.join(os.getcwd(), dateandtime + f"_frames")
                 if not os.path.exists(output_dir):
                     os.makedirs(output_dir)
 
+                width = int(self.video.get(cv2.CAP_PROP_FRAME_WIDTH))
+                height = int(self.video.get(cv2.CAP_PROP_FRAME_HEIGHT))
+                r = None
+                if self.cutCheckBox.isChecked():
+                    ret, frame = self.video.read()
+                    if ret:
+                        r = cv2.selectROI("Select cut area", frame)
+                        width = int(r[2])
+                        height = int(r[3])
+                        cv2.destroyAllWindows()
+                        self.video.set(cv2.CAP_PROP_POS_FRAMES, start_frame - 1)
+
+                print(f"[DEBUG] Cutting video frames of size {width}x{height}")
+
                 # Tworzenie numpy array zawierającego klatki koloru + klatka głębi na początku (jeżeli wczytany jest plik głębi)
                 if self.video_depth is None:
-                    frames = np.zeros((120, int(self.video.get(cv2.CAP_PROP_FRAME_HEIGHT)), int(self.video.get(cv2.CAP_PROP_FRAME_WIDTH)), 3), dtype=np.uint8)
+                    frames = np.zeros((120, height, width, 3), dtype=np.uint8)
                 else:
-                    frames = np.zeros((121, int(self.video.get(cv2.CAP_PROP_FRAME_HEIGHT)), int(self.video.get(cv2.CAP_PROP_FRAME_WIDTH)), 3), dtype=np.uint8)
+                    frames = np.zeros((121, height, width, 3), dtype=np.uint8)
 
                     self.video_depth.set(cv2.CAP_PROP_POS_FRAMES, start_frame-1)
                     ret, frame = self.video_depth.read()
 
                     if ret:
+
+                        if r is not None:
+                            frame = frame[int(r[1]):int(r[1] + r[3]),
+                                    int(r[0]):int(r[0] + r[2])]
+
                         frames[0] = frame
-                        output_filename = os.path.join(output_dir, f"frame_{start_frame}_depth.jpg")
+                        output_filename = os.path.join(output_dir, f"{dateandtime}_frame_depth.jpg")
                         cv2.imwrite(output_filename, frame)
 
-                output_videoname = os.path.join(output_dir, f"frames_{start_frame}.avi")
-                writer = cv2.VideoWriter(output_videoname, cv2.VideoWriter_fourcc(*"XVID"), self.fps, (int(self.video.get(cv2.CAP_PROP_FRAME_WIDTH)), int(self.video.get(cv2.CAP_PROP_FRAME_HEIGHT))) ,1)
+                output_videoname = os.path.join(output_dir, f"{dateandtime}_frames.avi")
+                writer = cv2.VideoWriter(output_videoname, cv2.VideoWriter_fourcc(*"XVID"), self.fps, (width, height),1)
                 
                 # Iterowanie przez wybrane klatki 
                 self.video.set(cv2.CAP_PROP_POS_FRAMES, start_frame-1)
+
+
                 print("[DEBUG] Writing frames...")
                 for i in range(start_frame, end_frame):
                     ret, frame = self.video.read()
+
+                    if r is not None:
+                        frame = frame[int(r[1]):int(r[1] + r[3]),
+                                        int(r[0]):int(r[0] + r[2])]
+
                     if ret:
                         # Zapis to filmu
                         writer.write(frame)
@@ -242,7 +269,7 @@ class MainDialog(QMainWindow, windowview.Ui_MainWindow):
 
                 # Zapis numpy array do pliku .npz (skompresowany)
                 print("[DEBUG] Writing compressed .npz file...")
-                np.savez_compressed(os.path.join(output_dir, f"frames_{start_frame}.npz"), frames)
+                np.savez_compressed(os.path.join(output_dir, f"{dateandtime}_frames.npz"), frames)
 
                 print("[DEBUG] Writing completed!")
 

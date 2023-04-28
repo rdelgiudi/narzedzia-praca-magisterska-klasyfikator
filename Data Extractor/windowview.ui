@@ -258,6 +258,19 @@
      <string>Depth video loaded:</string>
     </property>
    </widget>
+   <widget class="QCheckBox" name="cutCheckBox">
+    <property name="geometry">
+     <rect>
+      <x>889</x>
+      <y>760</y>
+      <width>131</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Cut video fragment</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
