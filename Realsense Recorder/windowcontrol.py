@@ -31,9 +31,11 @@ class MainDialog(QMainWindow, windowview.Ui_MainWindow):
         self.startButton.clicked.connect(self.startClicked)
         self.switchSourceButton.clicked.connect(self.switchSourceClicked)
         self.resolutionBox.currentIndexChanged.connect(self.resolutionBoxChanged)
+        self.disparityShiftBox.valueChanged.connect(self.disparityShiftBoxChanged)
 
         self.isRecording = False
         self.showDepth = False
+        self.disparityShift = 0
         self.dim = (640, 480)
     
     def closeEvent(self, a0: QCloseEvent) -> None:
@@ -77,6 +79,9 @@ class MainDialog(QMainWindow, windowview.Ui_MainWindow):
                 self.dim = (640, 480)
             case 1:
                 self.dim = (1280, 720)
+
+    def disparityShiftBoxChanged(self):
+        self.disparityShift = self.disparityShiftBox.value()
 
     def updateUi(self, depth_image_8U, color_image, fps, totalseconds):
 

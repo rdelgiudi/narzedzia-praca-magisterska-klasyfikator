@@ -1,3 +1,5 @@
+import json
+
 import pyrealsense2.pyrealsense2 as rs
 import numpy as np
 import datetime
@@ -5,6 +7,29 @@ from PyQt5 import QtGui
 import cv2
 import os
 from multiprocessing import Process, Queue
+
+# mappings
+occ_speed_map = {
+    'very_fast': 0,
+    'fast': 1,
+    'medium': 2,
+    'slow': 3,
+    'wall': 4,
+}
+tare_accuracy_map = {
+    'very_high': 0,
+    'high': 1,
+    'medium': 2,
+    'low': 3,
+}
+scan_map = {
+    'intrinsic': 0,
+    'extrinsic': 1,
+}
+fl_adjust_map = {
+    'right_only': 0,
+    'both_sides': 1
+}
 
 def updateUi(window, depth_image_8U, color_image, fps, totalseconds):
 
@@ -28,7 +53,7 @@ def updateUi(window, depth_image_8U, color_image, fps, totalseconds):
 
 def processWQueue(colorwqueue, depthwqueue, dims):
 
-    dateandtime = datetime.datetime.today().isoformat(timespec="seconds") 
+    dateandtime = datetime.datetime.today().isoformat(timespec="seconds")
 
     color_path = "videos/{}_rgb.avi".format(dateandtime)
     depth_path = "videos/{}_depth.avi".format(dateandtime)
@@ -37,15 +62,45 @@ def processWQueue(colorwqueue, depthwqueue, dims):
 
     while True:
         if colorwqueue.empty() and depthwqueue.empty():
-                continue
+            continue
         colordata = colorwqueue.get()
         depthdata = depthwqueue.get()
         if colordata == "DONE" and depthdata == "DONE":
             break
 
-        depthwriter.write(depthdata)
-        colorwriter.write(colordata)
-        
+        depth_success = False
+        color_success = False
+
+        if depthdata != "DONE":
+            depth_success = depthwriter.write(depthdata)
+        if colordata != "DONE":
+            color_success = colorwriter.write(colordata)
+
+        if not depth_success or not color_success:
+            print("[WARNING] Failed to save frame, if problem repeats, check if stream is properly configured and try again")
+
+def progress_callback(progress):
+    print(f'\rProgress  {progress}% ... ', end ="\r")
+def run_calibration(device ,speed = 'slow', scan = 'intrinsic'):
+    data = {
+        'calib type': 0,
+        'speed': occ_speed_map[speed],
+        'scan parameter': scan_map[scan],
+        'white_wall_mode': 1 if speed == 'wall' else 0,
+    }
+
+    args = json.dumps(data)
+
+    print('Starting On-Chip calibration...')
+    print(f'\tSpeed:\t{speed}')
+    print(f'\tScan:\t{scan}')
+    adev = device.as_auto_calibrated_device()
+    table, health = adev.run_on_chip_calibration(args, progress_callback, 30000)
+    print('On-Chip calibration finished')
+    print(f'\tHealth: {health}')
+    adev.set_calibration_table(table)
+
+
 
 def recording(worker):
     # Configure depth and color streams
@@ -54,7 +109,12 @@ def recording(worker):
 
     # Get device product line for setting a supporting resolution
     pipeline_wrapper = rs.pipeline_wrapper(pipeline)
-    pipeline_profile = config.resolve(pipeline_wrapper)
+
+    try:
+        pipeline_profile = config.resolve(pipeline_wrapper)
+    except:
+        print("ERROR: No device connected")
+        exit(-1)
     device = pipeline_profile.get_device()
     device_product_line = str(device.get_info(rs.camera_info.product_line))
 
@@ -64,8 +124,13 @@ def recording(worker):
             found_rgb = True
             break
     if not found_rgb:
-        print("The demo requires Depth camera with Color sensor")
+        print("The program requires Depth camera with Color sensor")
         exit(0)
+
+    # Set Disparity Shift
+    adv_mode = rs.rs400_advanced_mode(device)
+    depth_table_control_group = adv_mode.get_depth_table()
+    depth_table_control_group.disparityShift = worker.window.disparityShift
 
     dims = worker.window.dim
 
@@ -73,7 +138,7 @@ def recording(worker):
     config.enable_stream(rs.stream.depth, dims[0], dims[1], rs.format.z16, 30)
     config.enable_stream(rs.stream.color, dims[0], dims[1], rs.format.bgr8, 30)
 
-    #create output folder if it doesn't exist
+    # create output folder if it doesn't exist
     folder_name = "videos"
     if not os.path.exists(folder_name):
         os.mkdir(folder_name)
@@ -83,6 +148,8 @@ def recording(worker):
 
     # Start streaming
     profile = pipeline.start(config)
+
+    #run_calibration(device)
 
     depth_sensor = profile.get_device().first_depth_sensor()
     depth_scale = depth_sensor.get_depth_scale()
@@ -109,10 +176,10 @@ def recording(worker):
 
     try:
         while worker.window.isRecording:
-            
+
             #if not worker.window.isRecording:
             #    break
-            
+
             if (datetime.datetime.now()-fpstime).total_seconds() > 5:
                 framenum = 0
                 fpstime = datetime.datetime.now()
@@ -128,7 +195,7 @@ def recording(worker):
             aligned_frames = align.process(frames)
             alignend = datetime.datetime.now()
             aligntimes.append((alignend - alignstart).total_seconds())
-            
+
             #depth_frame = frames.get_depth_frame()
             #color_frame = frames.get_color_frame()
             #if not depth_frame or not color_frame:
@@ -137,20 +204,20 @@ def recording(worker):
             # Convert images to numpy array
             #depth_image = np.asanyarray(depth_frame.get_data())
             #color_image = np.asanyarray(color_frame.get_data())
-            
+
             aligned_depth_frame = aligned_frames.get_depth_frame()
             color_frame = aligned_frames.get_color_frame()
-            
+
             if not aligned_depth_frame or not color_frame:
                 continue
-            
+
             numpystart = datetime.datetime.now()
             depth_image = np.asanyarray(aligned_depth_frame.get_data())
             color_image = np.asanyarray(color_frame.get_data())
             depth_image_8U = cv2.convertScaleAbs(depth_image, alpha=0.03)
             numpyend = datetime.datetime.now()
             numpytimes.append((numpyend - numpystart).total_seconds())
-        
+
             #writestart = datetime.datetime.now()
             #colorwriter.write(color_image)
             #depthwriter.write(depth_image_8U)
@@ -177,7 +244,7 @@ def recording(worker):
         pipeline.stop()
 
         print("Waiting for writing process to finish...")
-        
+
         colorwqueue.put("DONE")
         depthwqueue.put("DONE")
         writethread.join()
@@ -196,5 +263,5 @@ def recording(worker):
         #print("Write: {} ms".format(writeavg * 1000))
         #print("Update UI: {} ms".format(updateuiavg * 1000))
 
-        
+
 
