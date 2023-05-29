@@ -28,6 +28,8 @@ class MainDialog(QMainWindow, windowview.Ui_MainWindow):
         self.setFixedSize(QSize(1045,680))
         self.app = app
 
+        self.errorLabel.setHidden(True)
+
         self.startButton.clicked.connect(self.startClicked)
         self.switchSourceButton.clicked.connect(self.switchSourceClicked)
         self.resolutionBox.currentIndexChanged.connect(self.resolutionBoxChanged)
@@ -37,6 +39,15 @@ class MainDialog(QMainWindow, windowview.Ui_MainWindow):
         self.showDepth = False
         self.disparityShift = 0
         self.dim = (640, 480)
+
+        self.thread = QThread()
+        self.worker = Worker(window=self)
+        self.worker.moveToThread(self.thread)
+        self.thread.started.connect(self.worker.run)
+        self.worker.finished.connect(self.thread.quit)
+        #self.worker.finished.connect(self.worker.deleteLater)
+        #self.thread.finished.connect(self.thread.deleteLater)
+        self.worker.progress.connect(self.updateUi)
     
     def closeEvent(self, a0: QCloseEvent) -> None:
 
@@ -48,21 +59,16 @@ class MainDialog(QMainWindow, windowview.Ui_MainWindow):
         if not self.isRecording:
             self.isRecording = True
             self.startButton.setText("Stop")
-            #Thread(target=recordlogic.recording, args=(self,)).start()
 
-            self.thread = QThread()
-            self.worker = Worker(window=self)
-            self.worker.moveToThread(self.thread)
-            self.thread.started.connect(self.worker.run)
-            self.worker.finished.connect(self.thread.quit)
-            self.worker.finished.connect(self.worker.deleteLater)
-            self.thread.finished.connect(self.thread.deleteLater)
-            self.worker.progress.connect(self.updateUi)
+            if self.thread.isRunning():
+                self.thread.wait()
+
             self.thread.start()
             
             #recordlogic.recording(self)
         else:
             self.isRecording = False
+            self.errorLabel.setHidden(True)
             self.startButton.setText("Start")
     
     def switchSourceClicked(self):

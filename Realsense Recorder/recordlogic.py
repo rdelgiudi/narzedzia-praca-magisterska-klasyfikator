@@ -68,16 +68,10 @@ def processWQueue(colorwqueue, depthwqueue, dims):
         if colordata == "DONE" and depthdata == "DONE":
             break
 
-        depth_success = False
-        color_success = False
-
         if depthdata != "DONE":
-            depth_success = depthwriter.write(depthdata)
+            depthwriter.write(depthdata)
         if colordata != "DONE":
-            color_success = colorwriter.write(colordata)
-
-        if not depth_success or not color_success:
-            print("[WARNING] Failed to save frame, if problem repeats, check if stream is properly configured and try again")
+            colorwriter.write(colordata)
 
 def progress_callback(progress):
     print(f'\rProgress  {progress}% ... ', end ="\r")
@@ -114,7 +108,9 @@ def recording(worker):
         pipeline_profile = config.resolve(pipeline_wrapper)
     except:
         print("ERROR: No device connected")
-        exit(-1)
+        worker.window.errorLabel.setHidden(False)
+        return
+
     device = pipeline_profile.get_device()
     device_product_line = str(device.get_info(rs.camera_info.product_line))
 
@@ -149,6 +145,7 @@ def recording(worker):
     # Start streaming
     profile = pipeline.start(config)
 
+    # Calibration before running
     #run_calibration(device)
 
     depth_sensor = profile.get_device().first_depth_sensor()

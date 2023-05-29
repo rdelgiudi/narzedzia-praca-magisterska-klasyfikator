@@ -57,6 +57,11 @@ class Ui_MainWindow(object):
         self.disparityShiftBox.setGeometry(QtCore.QRect(520, 620, 71, 31))
         self.disparityShiftBox.setMaximum(200)
         self.disparityShiftBox.setObjectName("disparityShiftBox")
+        self.errorLabel = QtWidgets.QLabel(self.centralwidget)
+        self.errorLabel.setEnabled(True)
+        self.errorLabel.setGeometry(QtCore.QRect(130, 630, 271, 16))
+        self.errorLabel.setTextFormat(QtCore.Qt.AutoText)
+        self.errorLabel.setObjectName("errorLabel")
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
@@ -75,6 +80,7 @@ class Ui_MainWindow(object):
         self.resolutionBox.setItemText(0, _translate("MainWindow", "480p"))
         self.resolutionBox.setItemText(1, _translate("MainWindow", "720p"))
         self.resolutionLabel_2.setText(_translate("MainWindow", "Disparity Shift:"))
+        self.errorLabel.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" color:#ff0000;\">ERROR: No camera device connected!</span></p></body></html>"))
 
 
 if __name__ == "__main__":
