@@ -31,26 +31,6 @@ fl_adjust_map = {
     'both_sides': 1
 }
 
-def updateUi(window, depth_image_8U, color_image, fps, totalseconds):
-
-    if window.showDepth:
-        qtimg = depth_image_8U
-        height, width = qtimg.shape
-        bytesPerLine = width
-        qImg = QtGui.QImage(qtimg.data, width, height, bytesPerLine, QtGui.QImage.Format_Grayscale8)
-    else:
-        qtimg = color_image
-        height, width, channel = qtimg.shape
-        bytesPerLine = 3 * width
-        qImg = QtGui.QImage(qtimg.data, width, height, bytesPerLine, QtGui.QImage.Format_RGB888)
-
-    pixmap01 = QtGui.QPixmap.fromImage(qImg)
-
-    window.viewLabel.setPixmap(pixmap01)
-
-    window.fpsValLabel.setText("{:.2f}".format(fps))
-    window.timeValLabel.setText(str(datetime.timedelta(seconds=totalseconds)))
-
 def processWQueue(colorwqueue, depthwqueue, dims):
 
     dateandtime = datetime.datetime.today().isoformat(timespec="seconds")
@@ -128,6 +108,13 @@ def recording(worker):
     depth_table_control_group = adv_mode.get_depth_table()
     depth_table_control_group.disparityShift = worker.window.disparityShift
 
+    # Set colorizer settings
+    colorizer = rs.colorizer()
+    if worker.window.histogramBox.currentIndex() == 1:
+        colorizer.set_option(rs.option.histogram_equalization_enabled, 1)
+    else:
+        colorizer.set_option(rs.option.histogram_equalization_enabled, 0)
+
     dims = worker.window.dim
 
     # config.enable_stream(rs.stream.depth, 640, 480, rs.format.z16, 30)
@@ -193,25 +180,25 @@ def recording(worker):
             alignend = datetime.datetime.now()
             aligntimes.append((alignend - alignstart).total_seconds())
 
-            #depth_frame = frames.get_depth_frame()
-            #color_frame = frames.get_color_frame()
-            #if not depth_frame or not color_frame:
-            #    continue
-
-            # Convert images to numpy array
-            #depth_image = np.asanyarray(depth_frame.get_data())
-            #color_image = np.asanyarray(color_frame.get_data())
-
-            aligned_depth_frame = aligned_frames.get_depth_frame()
+            depth_frame = aligned_frames.get_depth_frame()
             color_frame = aligned_frames.get_color_frame()
 
-            if not aligned_depth_frame or not color_frame:
+            if not depth_frame or not color_frame:
                 continue
 
+            # Filters (comment in and out for best effect)
+            #depth_frame = rs.hole_filling_filter().process(depth_frame)
+            #depth_frame = colorizer.colorize(depth_frame)
+
             numpystart = datetime.datetime.now()
-            depth_image = np.asanyarray(aligned_depth_frame.get_data())
+            depth_image = np.asanyarray(depth_frame.get_data())
             color_image = np.asanyarray(color_frame.get_data())
             depth_image_8U = cv2.convertScaleAbs(depth_image, alpha=0.03)
+
+            # Built in opencv histogram equalization
+            if worker.window.histogramBox.currentIndex() == 2:
+                depth_image_8U = cv2.equalizeHist(depth_image_8U)
+
             numpyend = datetime.datetime.now()
             numpytimes.append((numpyend - numpystart).total_seconds())
 

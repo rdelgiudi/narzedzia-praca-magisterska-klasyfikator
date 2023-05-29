@@ -151,7 +151,7 @@
     <property name="geometry">
      <rect>
       <x>430</x>
-      <y>620</y>
+      <y>640</y>
       <width>91</width>
       <height>31</height>
      </rect>
@@ -164,7 +164,7 @@
     <property name="geometry">
      <rect>
       <x>520</x>
-      <y>620</y>
+      <y>640</y>
       <width>71</width>
       <height>31</height>
      </rect>
@@ -191,6 +191,44 @@
     <property name="textFormat">
      <enum>Qt::AutoText</enum>
     </property>
+   </widget>
+   <widget class="QLabel" name="resolutionLabel_3">
+    <property name="geometry">
+     <rect>
+      <x>370</x>
+      <y>600</y>
+      <width>151</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Histogram equalization:</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="histogramBox">
+    <property name="geometry">
+     <rect>
+      <x>520</x>
+      <y>600</y>
+      <width>101</width>
+      <height>32</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>None</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Realsense</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>OpenCV</string>
+     </property>
+    </item>
    </widget>
   </widget>
  </widget>
