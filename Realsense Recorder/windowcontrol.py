@@ -29,6 +29,7 @@ class MainDialog(QMainWindow, windowview.Ui_MainWindow):
         self.app = app
 
         self.errorLabel.setHidden(True)
+        self.histogramBox.setCurrentIndex(2)
 
         self.startButton.clicked.connect(self.startClicked)
         self.switchSourceButton.clicked.connect(self.switchSourceClicked)
@@ -38,7 +39,7 @@ class MainDialog(QMainWindow, windowview.Ui_MainWindow):
         self.isRecording = False
         self.showDepth = False
         self.disparityShift = 0
-        self.dim = (640, 480)
+        self.dim = (848, 480)
 
         self.thread = QThread()
         self.worker = Worker(window=self)
@@ -82,7 +83,7 @@ class MainDialog(QMainWindow, windowview.Ui_MainWindow):
     def resolutionBoxChanged(self):
         match self.resolutionBox.currentIndex():
             case 0:
-                self.dim = (640, 480)
+                self.dim = (848, 480)
             case 1:
                 self.dim = (1280, 720)
 

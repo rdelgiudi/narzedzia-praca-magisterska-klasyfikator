@@ -33,24 +33,30 @@ fl_adjust_map = {
 
 def processWQueue(colorwqueue, depthwqueue, dims):
 
-    dateandtime = datetime.datetime.today().isoformat(timespec="seconds")
+    dateandtime = datetime.datetime.today().isoformat("-", "seconds")
 
-    color_path = "videos/{}_rgb.avi".format(dateandtime)
-    depth_path = "videos/{}_depth.avi".format(dateandtime)
+    output_dir = os.path.join(os.getcwd(), "videos")
+
+    color_path = os.path.join(output_dir, "{}_rgb.avi".format(dateandtime))
+    depth_path = os.path.join(output_dir, "{}_depth.avi".format(dateandtime))
+
+    print(f"[INFO] Saving video of dimensions {dims[0]} x {dims[1]}")
+    print(f"[INFO] Saving color stream to: {color_path}")
+    print(f"[INFO] Saving depth stream to: {depth_path}")
     colorwriter = cv2.VideoWriter(color_path, cv2.VideoWriter_fourcc(*"XVID"), 30, dims, 1)
-    depthwriter = cv2.VideoWriter(depth_path, cv2.VideoWriter_fourcc(*"XVID"), 30, dims, 0)
+    depthwriter = cv2.VideoWriter(depth_path, cv2.VideoWriter_fourcc(*"DIVX"), 30, dims, 0)
 
     while True:
         if colorwqueue.empty() and depthwqueue.empty():
             continue
         colordata = colorwqueue.get()
         depthdata = depthwqueue.get()
-        if colordata == "DONE" and depthdata == "DONE":
+        if type(colordata) == str and type(depthdata) == str:
             break
 
-        if depthdata != "DONE":
+        if type(depthdata) != str:
             depthwriter.write(depthdata)
-        if colordata != "DONE":
+        if type(colordata) != str:
             colorwriter.write(colordata)
 
 def progress_callback(progress):
@@ -136,6 +142,11 @@ def recording(worker):
     #run_calibration(device)
 
     depth_sensor = profile.get_device().first_depth_sensor()
+
+    # Depth unit, set to equivalent of 100 in RealSense Viewer
+    if depth_sensor.supports(rs.option.depth_units):
+        depth_sensor.set_option(rs.option.depth_units, 0.0001)
+
     depth_scale = depth_sensor.get_depth_scale()
 
     align_to = rs.stream.color
@@ -224,10 +235,11 @@ def recording(worker):
             #updateuitimes.append((updateuiend - updateuistart).total_seconds())
 
     finally:
+        print("Waiting for writing process to finish...")
+
         # Stop streaming
         pipeline.stop()
 
-        print("Waiting for writing process to finish...")
 
         colorwqueue.put("DONE")
         depthwqueue.put("DONE")
