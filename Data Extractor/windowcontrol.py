@@ -222,12 +222,22 @@ class MainDialog(QMainWindow, windowview.Ui_MainWindow):
                 print(f"[DEBUG] Cutting video frames of size {width}x{height}")
 
                 # Tworzenie numpy array zawierającego klatki koloru + klatka głębi na początku (jeżeli wczytany jest plik głębi)
-                if self.video_depth is None:
-                    frames = np.zeros((120, height, width, 3), dtype=np.uint8)
-                else:
-                    frames = np.zeros((121, height, width, 3), dtype=np.uint8)
 
-                    self.video_depth.set(cv2.CAP_PROP_POS_FRAMES, start_frame-1)
+                output_videoname = os.path.join(output_dir, f"{dateandtime}_frames.avi")
+                writer = cv2.VideoWriter(output_videoname, cv2.VideoWriter_fourcc(*"XVID"), self.fps, (width, height), 1)
+                photo_output = os.path.join(output_dir, f"{dateandtime}_imageframes")
+                if not os.path.exists(photo_output):
+                    os.makedirs(photo_output)
+
+                iter = 0
+
+                if self.video_depth is None:
+                    pass
+                    #frames = np.zeros((120, height, width, 3), dtype=np.uint8)
+                else:
+                    #frames = np.zeros((121, height, width, 3), dtype=np.uint8)
+
+                    self.video_depth.set(cv2.CAP_PROP_POS_FRAMES, start_frame + (end_frame - start_frame) / 2)
                     ret, frame = self.video_depth.read()
 
                     if ret:
@@ -236,16 +246,14 @@ class MainDialog(QMainWindow, windowview.Ui_MainWindow):
                             frame = frame[int(r[1]):int(r[1] + r[3]),
                                     int(r[0]):int(r[0] + r[2])]
 
-                        frames[0] = frame
-                        output_filename = os.path.join(output_dir, f"{dateandtime}_frame_depth.jpg")
+                        #frames[0] = frame
+                        output_filename = os.path.join(photo_output, f"{iter:03d}.jpg")
                         cv2.imwrite(output_filename, frame)
-
-                output_videoname = os.path.join(output_dir, f"{dateandtime}_frames.avi")
-                writer = cv2.VideoWriter(output_videoname, cv2.VideoWriter_fourcc(*"XVID"), self.fps, (width, height),1)
+                        writer.write(frame)
+                        iter += 1
                 
-                # Iterowanie przez wybrane klatki 
+                # Iterowanie przez wybrane klatki
                 self.video.set(cv2.CAP_PROP_POS_FRAMES, start_frame-1)
-
 
                 print("[DEBUG] Writing frames...")
                 for i in range(start_frame, end_frame):
@@ -258,23 +266,25 @@ class MainDialog(QMainWindow, windowview.Ui_MainWindow):
                     if ret:
                         # Zapis to filmu
                         writer.write(frame)
-
+                        output_filename = os.path.join(photo_output, f"{iter:03d}.jpg")
+                        cv2.imwrite(output_filename, frame)
+                        iter += 1
                         # Zapis do numpy array
-                        if self.video_depth is None:
-                            frames[i-start_frame] = frame
-                        else:
-                            frames[i-start_frame+1] = frame
+                        #if self.video_depth is None:
+                        #    frames[i-start_frame] = frame
+                        #else:
+                        #    frames[i-start_frame+1] = frame
                     else:
                         break
 
                 # Zapis numpy array do pliku .npz (skompresowany)
-                print("[DEBUG] Writing compressed .npz file...")
-                np.savez_compressed(os.path.join(output_dir, f"{dateandtime}_frames.npz"), frames)
+                #print("[DEBUG] Writing compressed .npz file...")
+                #np.savez_compressed(os.path.join(output_dir, f"{dateandtime}_frames.npz"), frames)
 
                 print("[DEBUG] Writing completed!")
 
                 # Informacja o powodzeniu
-                QMessageBox.information(self, "Frame Cut Successful!", f"The cut frames were saved to:\n{output_dir}\n.npz file saved to:\n{os.path.join(output_dir, f'frames_{start_frame}.npz')}.")
+                QMessageBox.information(self, "Frame Cut Successful!", f"The cut frames were saved to:\n{output_dir}\njpg files saved to:\n{photo_output}.")
 
                 self.video.set(cv2.CAP_PROP_POS_FRAMES, frame_number)
                 writer.release()
