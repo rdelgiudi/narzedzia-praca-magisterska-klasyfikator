@@ -8,6 +8,9 @@ import os
 
 
 if __name__ == "__main__":
+    #https://github.com/NVlabs/instant-ngp/discussions/300#discussioncomment-5353810
+    #pip install --no-binary opencv-python opencv-python
+    #na wypadek problemów konfliktu pluginów w qt i opencv
     #ci_build_and_not_headless = False
     #try:
     #    from cv2.version import ci_build, headless
