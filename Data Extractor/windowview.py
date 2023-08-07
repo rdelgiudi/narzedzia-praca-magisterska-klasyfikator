@@ -81,8 +81,11 @@ class Ui_MainWindow(object):
         self.depthLabel.setGeometry(QtCore.QRect(40, 670, 861, 16))
         self.depthLabel.setObjectName("depthLabel")
         self.cutCheckBox = QtWidgets.QCheckBox(self.centralwidget)
-        self.cutCheckBox.setGeometry(QtCore.QRect(889, 760, 131, 20))
+        self.cutCheckBox.setGeometry(QtCore.QRect(890, 780, 131, 20))
         self.cutCheckBox.setObjectName("cutCheckBox")
+        self.timeLabel = QtWidgets.QLabel(self.centralwidget)
+        self.timeLabel.setGeometry(QtCore.QRect(860, 750, 181, 21))
+        self.timeLabel.setObjectName("timeLabel")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 1224, 21))
@@ -112,6 +115,7 @@ class Ui_MainWindow(object):
         self.colorLabel.setText(_translate("MainWindow", "Color video loaded:"))
         self.depthLabel.setText(_translate("MainWindow", "Depth video loaded:"))
         self.cutCheckBox.setText(_translate("MainWindow", "Cut video fragment"))
+        self.timeLabel.setText(_translate("MainWindow", "Time : 0"))
 
 
 if __name__ == "__main__":

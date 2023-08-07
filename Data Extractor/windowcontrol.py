@@ -100,6 +100,7 @@ class MainDialog(QMainWindow, windowview.Ui_MainWindow):
     # Funkcja aktualizująca label informujący o obecnej klatce
     def setFrameLabel(self, val):
         self.frameLabel.setText(f"Frame: {val} / {self.total_frames}")
+        self.timeLabel.setText(f"Time: {val / self.fps:.2f} s")
 
     # Funkcja ustawiająca następną klatkę
     def nextFrame(self):

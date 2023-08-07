@@ -261,14 +261,27 @@
    <widget class="QCheckBox" name="cutCheckBox">
     <property name="geometry">
      <rect>
-      <x>889</x>
-      <y>760</y>
+      <x>890</x>
+      <y>780</y>
       <width>131</width>
       <height>20</height>
      </rect>
     </property>
     <property name="text">
      <string>Cut video fragment</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="timeLabel">
+    <property name="geometry">
+     <rect>
+      <x>860</x>
+      <y>750</y>
+      <width>181</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Time : 0</string>
     </property>
    </widget>
   </widget>
