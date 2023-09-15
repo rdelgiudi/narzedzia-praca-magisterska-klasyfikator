@@ -1,4 +1,4 @@
-# Narzędzia klasyfikator zachowań
+# Repozytorium narzędzi użytych do realizacji pracy magisterskiej
 Zestaw narzędzi użyty w mojej pracy magisterskiej.
 
 ## Realsense Recorder
@@ -38,4 +38,7 @@ sudo apt install libopencv-dev
 TODO
 
 ## Data Extractor
-Program do wydobywania klatek, aby zebrać dataset. Program wycina 11 klatek obrazu wokół wskazanej klatki oraz zapisuje w formie zdjęć oraz w formie pliku .npy. Program na ten moment uruchamia się, ale jest niekompletny.
+Program do wydobywania klatek, aby zebrać dataset. Program wycina 120 kolejnych klatek obrazu oraz zapisuje w formie pliku .avi oraz jako seria obrazów .jpg.
+
+## Model Training and Misc
+Zestaw narzędzi zawierający skrypt trenujący oraz inne pomniejsze narzędzia.
